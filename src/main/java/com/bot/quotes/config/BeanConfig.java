@@ -16,6 +16,7 @@ public class BeanConfig {
     public Logger logger(InjectionPoint ip){
         return LoggerFactory.getLogger(ip.getMember().getDeclaringClass());
     }
+
     @Bean
     public Random random(){
         return new Random();
