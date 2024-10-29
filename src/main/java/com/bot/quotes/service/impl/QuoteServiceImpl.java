@@ -29,7 +29,6 @@ public class QuoteServiceImpl implements QuoteService {
 
     @Override
     public ResponseQuoteDto saveQuote(RequestQuoteDto quote) {
-        Quote model = quoteMapper.toModel(quote);
         return quoteMapper.toResponseQuoteDto(quoteRepository.save(quoteMapper.toModel(quote)));
     }
 
