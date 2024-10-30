@@ -1,5 +1,6 @@
 package com.bot.quotes.controller;
 
+import com.bot.quotes.client.QuoteClient;
 import com.bot.quotes.dto.RequestQuoteDto;
 import com.bot.quotes.dto.ResponseQuoteDto;
 import com.bot.quotes.service.QuoteService;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping(value = "/quotes") //http://localhost:8080/api/quotes
 public class QuoteController {
     private final QuoteService quoteService;
+    private final QuoteClient quoteClient;
 
     @GetMapping(value = "/size") //http://localhost:8080/api/quotes/size
     public Long getSize(){
@@ -27,7 +29,8 @@ public class QuoteController {
 
     @GetMapping(value = "/all") //http://localhost:8080/api/quotes/all
     public List<ResponseQuoteDto> getAll(){
-        return quoteService.getAll();
+        System.out.println(quoteClient.getRandomQuote());
+       return quoteService.getAll();
     }
 
     @PostMapping(value = "/save") //http://localhost:8080/api/quotes/save
