@@ -12,6 +12,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapperConfig.class)
 public interface QuoteMapper {
     Quote toModel(RequestQuoteDto requestQuoteDto);
+    Quote toModel(String quote, String characterName, String animeName);
 
     //    @Mapping(target = "record", ignore = true)
     ResponseQuoteDto toResponseQuoteDto(Quote quote);

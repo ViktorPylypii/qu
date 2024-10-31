@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,8 +20,9 @@ public class QuoteClient {
 
     private final ObjectMapper objectMapper;
     private final Logger logger;
-    public AnimeInfoDto getRandomQuote(){
-        AnimeInfoDto animeInfoDto = new AnimeInfoDto();
+
+    public Optional<AnimeInfoDto> getRandomQuote(){
+        AnimeInfoDto animeInfoDto = null;
         try {
         URI uri = URI.create(ANIME_API_URL);
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -35,6 +37,6 @@ public class QuoteClient {
         } catch (IOException | InterruptedException e) {
             logger.warn("Не прийшли дані");
         }
-        return animeInfoDto;
+        return Optional.ofNullable(animeInfoDto);
     }
 }

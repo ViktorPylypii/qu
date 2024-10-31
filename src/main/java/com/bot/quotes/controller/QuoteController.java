@@ -29,7 +29,6 @@ public class QuoteController {
 
     @GetMapping(value = "/all") //http://localhost:8080/api/quotes/all
     public List<ResponseQuoteDto> getAll(){
-        System.out.println(quoteClient.getRandomQuote());
        return quoteService.getAll();
     }
 
