@@ -13,6 +13,8 @@ import org.mapstruct.MappingTarget;
 public interface QuoteMapper {
     Quote toModel(RequestQuoteDto requestQuoteDto);
     Quote toModel(String quote, String characterName, String animeName);
+    Quote toModel(String quote, String characterName, String animeName, byte[] imageData);
+
 
     //    @Mapping(target = "record", ignore = true)
     ResponseQuoteDto toResponseQuoteDto(Quote quote);
