@@ -42,6 +42,6 @@ public class QuoteController {
     @ResponseStatus(code = HttpStatus.OK)
     public String ryan() {
         rayanService.sendRyanGosling();
-        return Constants.Ryan_Gosling.name();
+        return Constants.Ryan_Gosling.name(); // name() - перетворює enum в String
     }
 }
