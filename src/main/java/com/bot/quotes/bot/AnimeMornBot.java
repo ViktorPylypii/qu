@@ -16,7 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -29,11 +28,13 @@ public class AnimeMornBot extends TelegramLongPollingBot {
     private static final String HELP_COMMAND = "/help";
     private static final String UNSUBSCRIBE_COMMAND = "/unsubscribe";
     private static final String SUBSCRIBE_COMMAND = "/subscribe";
+    private static final String CHAT_ID = "-1002294333131";
     private final String botUserName;
     private final QuoteRepository quoteRepository;
     private final Random random;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
     @Override
     public void onUpdateReceived(Update update) {
         String text = update.getMessage() == null ? "nothing" : update.getMessage().getText();
@@ -46,35 +47,6 @@ public class AnimeMornBot extends TelegramLongPollingBot {
         }
         else if( text != null && text.equals(UNSUBSCRIBE_COMMAND)){
             handleUnsubscribeCommand(update);
-        }
-    }
-
-    @Scheduled(initialDelay = 19000, fixedRate = 3600000)
-    private void usersMailing(){
-        List<User> allUsers = userRepository.findAll();
-        List<Quote> allQuotes = quoteRepository.findAll();
-        SendPhoto sendPhoto = new SendPhoto();
-        for (User user : allUsers) {
-            int randomNum = random.nextInt(allQuotes.size());
-            Quote quote = allQuotes.get(randomNum);
-            sendPhoto.setChatId(user.getChatId());
-            byte[] imageDataBytes = quote.getImageData();
-            File tempFile = null;
-            try {
-                tempFile = File.createTempFile("tempImage", ".jpg");
-                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                    fos.write(imageDataBytes);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            sendPhoto.setPhoto(new InputFile(tempFile));
-            sendPhoto.setCaption(quote.getQuote() + System.lineSeparator() + quote.getCharacterName());
-            try {
-                execute(sendPhoto);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -200,68 +172,57 @@ public class AnimeMornBot extends TelegramLongPollingBot {
                 .replace("!", "\\!");
     }
 
-    @Scheduled(initialDelay = 20000, fixedRate = 3600000)
-    public void sendNoonRandomQuotes() {
-        long count = quoteRepository.count();
-        long randomNumber = random.nextLong(count) + 1; // nextLong() - задає рандомне число в заданому проміжку
-        Optional<Quote> byId = quoteRepository.findById(randomNumber);
-        Quote quote = byId.orElseThrow(() -> new RuntimeException("Can't get random quote"));
+    @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Kiev")  // Спрацьовує щодня о 10:00 за Київським часом
+    private void usersMailing(){
+        List<User> allUsers = userRepository.findAll();
+        List<Quote> allQuotes = quoteRepository.findAll();
         SendPhoto sendPhoto = new SendPhoto();
-        sendPhoto.setChatId("-1002294333131");
-        byte[] imageDataBytes = quote.getImageData();
-        File tempFile = null;
-        try {
-            tempFile = File.createTempFile("tempImage", ".jpg");
-            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                fos.write(imageDataBytes);
+        for (User user : allUsers) {
+            int randomNum = random.nextInt(allQuotes.size());
+            Quote quote = allQuotes.get(randomNum);
+            sendPhoto.setChatId(user.getChatId());
+            byte[] imageDataBytes = quote.getImageData();
+            File tempFile = null;
+            try {
+                tempFile = File.createTempFile("tempImageForUser", ".jpg");
+                try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                    fos.write(imageDataBytes);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        sendPhoto.setPhoto(new InputFile(tempFile));
-        sendPhoto.setCaption(quote.getQuote() + System.lineSeparator() + quote.getCharacterName());
-        try {
-            execute(sendPhoto);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            sendPhoto.setPhoto(new InputFile(tempFile));
+            sendPhoto.setCaption(quote.getQuote() + System.lineSeparator() + quote.getCharacterName());
+            try {
+                execute(sendPhoto);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    @Scheduled(initialDelay = 15000, fixedRate = 3600000)
+    @Scheduled(cron = "0 0 9 * * *", zone = "Europe/Kiev")  // Спрацьовує щодня о 9:00 за Київським часом
     public void sendMorningRandomQuotes() {
-        long count = quoteRepository.count();
-        long randomNumber = random.nextLong(count) + 1; // nextLong() - задає рандомне число в заданому проміжку
-        Optional<Quote> byId = quoteRepository.findById(randomNumber);
-        Quote quote = byId.orElseThrow(() -> new RuntimeException("Can't get random quote"));
-        SendPhoto sendPhoto = new SendPhoto();
-        sendPhoto.setChatId("-1002294333131");
-        byte[] imageDataBytes = quote.getImageData();
-        File tempFile = null;
-        try {
-            tempFile = File.createTempFile("tempImage", ".jpg");
-            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                fos.write(imageDataBytes);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        sendPhoto.setPhoto(new InputFile(tempFile));
-        sendPhoto.setCaption(quote.getQuote() + System.lineSeparator() + quote.getCharacterName());
-        try {
-            execute(sendPhoto);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
+        sendRandomQuote();
     }
 
-    @Scheduled(initialDelay = 30000, fixedRate = 3600000)
+    @Scheduled(cron = "0 0 12 * * *", zone = "Europe/Kiev")  // Спрацьовує щодня о 12:00 за Київським часом
+    public void sendNoonRandomQuotes() {
+        sendRandomQuote();
+    }
+
+    @Scheduled(cron = "0 0 21 * * *", zone = "Europe/Kiev")  // Спрацьовує щодня о 21:00 за Київським часом
     public void sendEveningRandomQuotes() {
+        sendRandomQuote();
+    }
+
+    private void sendRandomQuote() {
         long count = quoteRepository.count();
         long randomNumber = random.nextLong(count) + 1; // nextLong() - задає рандомне число в заданому проміжку
         Optional<Quote> byId = quoteRepository.findById(randomNumber);
         Quote quote = byId.orElseThrow(() -> new RuntimeException("Can't get random quote"));
         SendPhoto sendPhoto = new SendPhoto();
-        sendPhoto.setChatId("-1002294333131");
+        sendPhoto.setChatId(CHAT_ID);
         byte[] imageDataBytes = quote.getImageData();
         File tempFile = null;
         try {
