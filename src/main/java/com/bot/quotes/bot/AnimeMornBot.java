@@ -44,8 +44,7 @@ public class AnimeMornBot extends TelegramLongPollingBot {
             handleHelpCommand(update);
         }else if( text != null && text.equals(SUBSCRIBE_COMMAND)){
             handleSubscribeCommand(update);
-        }
-        else if( text != null && text.equals(UNSUBSCRIBE_COMMAND)){
+        } else if( text != null && text.equals(UNSUBSCRIBE_COMMAND)){
             handleUnsubscribeCommand(update);
         }
     }
@@ -250,13 +249,14 @@ public class AnimeMornBot extends TelegramLongPollingBot {
     public AnimeMornBot(@Value("${bot.token}") String token,
                         @Value("${bot.name}") String botName,
                         QuoteRepository quoteRepository,
-                        Random random,UserMapper userMapper, UserRepository userRepository) {
+                        Random random,
+                        UserMapper userMapper,
+                        UserRepository userRepository) {
         super(token);
         this.botUserName = botName;
         this.quoteRepository = quoteRepository;
         this.random = random;
         this.userMapper = userMapper;
         this.userRepository = userRepository;
-
     }
 }

@@ -24,12 +24,12 @@ public class QuoteController {
     private final RyanService rayanService;
 
     @GetMapping(value = "/size") //http://localhost:8080/api/quotes/size
-    public Long getSize(){
+    public Long getSize() {
        return quoteService.getSize();
     }
 
     @GetMapping(value = "/all") //http://localhost:8080/api/quotes/all
-    public List<ResponseQuoteDto> getAll(){
+    public List<ResponseQuoteDto> getAll() {
        return quoteService.getAll();
     }
 

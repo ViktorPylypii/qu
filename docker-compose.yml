@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   postgresdb:
-    platform: linux/arm64
     image: postgres
+    platform: linux/amd64
     restart: unless-stopped
     env_file: ./.env
     environment:
@@ -16,6 +16,8 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U postgres"]
       timeout: 30s
       retries: 3
+
+
   app:
     depends_on:
       postgresdb:
@@ -36,7 +38,7 @@ services:
         "spring.datasource.driver-class-name" : "org.postgresql.Driver",
         "spring.jpa.hibernate.ddl-auto" : "create-drop",
         "server.servlet.context-path" : "/api",
-        "bot.token" : "$TELERGRAM_TOKEN",
-        "bot.name" : "$TELERGRAM_NAME"       
+        "bot.token" : "$TELEGRAM_TOKEN",
+        "bot.name" : "$TELEGRAM_NAME"       
       }'
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
